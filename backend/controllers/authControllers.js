@@ -58,11 +58,11 @@ const authController = {
     try {
       const user = await User.findOne({ username: req.body.username });
       if (!user) {
-        res.status(404).json("Wrong username!");
+        return res.status(404).json("Wrong username!");
       }
       const validatePw = await bcrypt.compare(req.body.password, user.password);
       if (!validatePw) {
-        res.status(404).json("Wrong password!");
+        return res.status(404).json("Wrong password!");
       }
       if (user && validatePw) {
         // Đăng ký token JWT
@@ -128,7 +128,9 @@ const authController = {
 
   // Logout
   userLogout: async (req, res) => {
-    arrRefreshTokens = arrRefreshTokens.filter((itm) => token !== req.cookies.refreshToken)
+    arrRefreshTokens = arrRefreshTokens.filter(
+      (itm) => token !== req.cookies.refreshToken
+    );
     res.clearCookie("refreshToken");
     res.status(200).json("Logged out successfully!");
   },
