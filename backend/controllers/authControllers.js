@@ -2,7 +2,7 @@ const bcrypt = require("bcrypt");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 
-const arrRefreshTokens = []; // Sau này lưu vào DB Redit
+let arrRefreshTokens = []; // Sau này lưu vào DB Redit
 
 const authController = {
   // Register
@@ -129,7 +129,7 @@ const authController = {
   // Logout
   userLogout: async (req, res) => {
     arrRefreshTokens = arrRefreshTokens.filter(
-      (itm) => token !== req.cookies.refreshToken
+      (itm) => itm !== req.cookies.refreshToken
     );
     res.clearCookie("refreshToken");
     res.status(200).json("Logged out successfully!");
