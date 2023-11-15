@@ -1,4 +1,7 @@
 import {
+  logOutFailed,
+  logOutStart,
+  logOutSuccess,
   loginFailed,
   loginStart,
   loginSuccess,
@@ -88,11 +91,30 @@ export const refreshToken = async () => {
       headers: {
         "Content-Type": "application/json",
       },
-      withCredentials: true
+      withCredentials: true,
     });
-    console.log(res);
-    return res.data
+
+    return res.data;
   } catch (error) {
     console.log(error);
+  }
+};
+
+export const logOutUser = async (accessToken,id, navigate, dispatch, axiosJWT) => {
+  dispatch(logOutStart());
+  try {
+    console.log(accessToken)
+    await axiosJWT.post("http://localhost:8000/v1/auth/logout", {
+      headers: {
+        "Content-Type": "application/json",
+        token: `Bearer ${accessToken}`,
+      },
+      // withCredentials: true,
+    });
+
+    dispatch(logOutSuccess());
+    navigate("/login");
+  } catch (error) {
+    dispatch(logOutFailed());
   }
 };

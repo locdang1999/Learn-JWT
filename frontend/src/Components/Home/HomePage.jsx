@@ -1,9 +1,8 @@
 import { useEffect } from "react";
-import { jwtDecode } from "jwt-decode";
 import "./home.css";
-import { deleteUsers, getAllUsers, refreshToken } from "../../redux/apiRequest";
+import { deleteUsers, getAllUsers } from "../../redux/apiRequest";
 import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
+import { createAxios } from "../../createInstance";
 import { loginSuccess } from "../../redux/authSlice";
 
 const HomePage = () => {
@@ -11,30 +10,7 @@ const HomePage = () => {
   const dispatch = useDispatch();
   const userData = useSelector((state) => state.userReducer.users?.allUsers);
   const msg = useSelector((state) => state.userReducer.msg);
-
-  const axiosJWT = axios.create();
-
-  axiosJWT.interceptors.request.use(
-    async (config) => {
-      let date = new Date();
-      const decodeToken = jwtDecode(user?.accessToken);
-      console.log(decodeToken);
-      if (decodeToken.exp < date.getTime() / 1000) {
-        const data = await refreshToken();
-        const refreshUser = {
-          ...user,
-          accessToken: data.accessToken,
-        };
-
-        dispatch(loginSuccess(refreshUser));
-        config.headers["token"] = "Bearer " + data.accessToken;
-      }
-      return config;
-    },
-    (err) => {
-      return Promise.reject(err);
-    }
-  );
+  const axiosJWT = createAxios(user, dispatch, loginSuccess);
 
   useEffect(() => {
     getAllUsers(user?.accessToken, dispatch, axiosJWT);
@@ -48,7 +24,7 @@ const HomePage = () => {
     <main className="home-container">
       <div className="home-title">User List</div>
       <div className="home-role">{`Your role: ${
-        user?.admin ? "Admin" : "User"
+        !user ? "" : user?.admin ? "Admin" : "User"
       }`}</div>
       <div className="home-userlist">
         {userData?.map((user, idx) => {

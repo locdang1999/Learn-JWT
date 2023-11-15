@@ -3,10 +3,13 @@ const jwt = require("jsonwebtoken");
 const middlewareController = {
   // VerifyToken
   verifyToken: (req, res, next) => {
+    
     const token = req.headers.token;
+    console.log("token ", token);
     if (token) {
       //Bearer 2313
       const accessToken = token.split(" ")[1];
+      
       jwt.verify(accessToken, process.env.JWT_ACCESS_KEY, (err, user) => {
         if (err) {
           return res.status(403).json("Token is not valid");
